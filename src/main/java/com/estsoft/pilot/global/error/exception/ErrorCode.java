@@ -20,22 +20,11 @@ public enum ErrorCode {
     REFRESH_TOKEN_NOT_FOUND(400, "해당 refresh token은 존재하지 않습니다."),
 
 
-    // 상품
-    FIRST_ITEM_IMAGE_NOT_EXISTS(400, "첫번째 상품 이미지는 필수 입력 값 입니다."),
-    ITEM_NOT_EXISTS(400, "상품 정보가 존재하지 않습니다."),
-    INVALID_ITEM_ID(400, "수정하려는 item의 id값이 일치하지 않습니다."),
-
-    // 배송
-    DELIVERY_NOT_EXISTS(400, "배송 정보가 존재하지 않습니다."),
-
-    // 회원
-    MEMBER_NOT_EXISTS(400, "해당 회원은 존재하지 않습니다."),
-    HAS_NOT_ADMIN_ROLE(401, "해당 회원은 ADMIN 권한이 없습니다."),
-
-    // 주문
-    ORDER_NOT_EXISTS(400, "해당 주문은 존재하지 않습니다."),
-    NOT_MEMBER_ORDER(403, "해당 회원의 주문이 아닙니다.")
-    ;
+    // 게시판
+    NOT_EXISTS_BOARD(400, "게시글 정보가 존재하지 않습니다."),
+    NOT_EXISTS_COMMENT(400, "댓글 정보가 존재하지 않습니다,"),
+    INVALID_BOARD_ID(400, "수정하려는 board의 id값이 일치하지 않습니다."),
+    MISMATCHED_BOARD_COMMENT_ID(400, "수정하려는 comment는 board_id에 해당하는 게시글의 댓글이 아닙니다.");
 
     ErrorCode(int status, String message) {
         this.status = status;

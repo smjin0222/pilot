@@ -15,20 +15,20 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
     properties:
       hibernate:
-        format_sql : true # sql 예쁘게 출력
+        format_sql : true
         default_batch_fetch_size: 1000
 
     show-sql: true  # sql 출력
 
   servlet:
     multipart:
-      max-file-size: 10MB # 파일 업로드 요청 시 하나의 파일 크기 10MB로 제한
-      max-request-size: 100MB # 파일 업로드 요청 시 모든 파일의 크기의합 100MB로 제한
+      max-file-size: 10MB
+      max-request-size: 100MB
 
 logging:
   level:
-    org.hibernate.type: trace # sql binding 값 출력s
+    org.hibernate.type: trace

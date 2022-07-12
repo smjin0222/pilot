@@ -1,8 +1,10 @@
 package com.estsoft.pilot.domain.comment.entity;
 
 import com.estsoft.pilot.domain.base.BaseTimeEntity;
+import com.estsoft.pilot.domain.board.entity.Board;
 import com.estsoft.pilot.domain.comment.constant.CommentStatus;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,5 +25,29 @@ public class Comment extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "comment_status", nullable = false)
-    private CommentStatus commentStatus;
+    private CommentStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id", nullable = false)
+    private Board board;
+
+    @Builder
+    public Comment(String content,
+                   CommentStatus status) {
+        this.content = content;
+        this.status = status;
+    }
+
+    public void setBoard(Board board) {
+        this.board = board;
+        board.getComments().add(this);
+    }
+
+    public void changeContent(String content) {
+        this.content = content;
+    }
+
+    public void updateCommentStatus(CommentStatus status) {
+        this.status = status;
+    }
 }

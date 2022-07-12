@@ -6,13 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class BoardInsertDto {
+public class BoardReplyDto {
 
     @NotBlank(message = "제목은 필수 입력 값입니다.")
     private String title;
@@ -27,6 +28,7 @@ public class BoardInsertDto {
     private Integer groupSeq;
 
     @NotNull(message = "indent는 필수값입니다.")
+    @Max(value = 5, message = "최대 답글 중복 5개")
     private Integer indent;
 
     public Board toEntity() {
@@ -36,8 +38,8 @@ public class BoardInsertDto {
                 .status(BoardStatus.NORMAL)
                 .viewCnt(0)
                 .groupNo(groupNo)
-                .groupSeq(groupSeq)
-                .indent(indent)
+                .groupSeq(groupSeq + 1)
+                .indent(indent + 1)
                 .build();
     }
 }
