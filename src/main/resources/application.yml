@@ -32,3 +32,15 @@ spring:
 logging:
   level:
     org.hibernate.type: trace
+
+token:
+  secret: jwt-token-secret
+  access-token-expiration-time: 900000  # 15분
+  refresh-token-expiration-time: 1210500000 # 2주
+
+estsoft:
+  oauth:
+    server: http://localhost:8081
+    client:
+      id: root
+      secret: root

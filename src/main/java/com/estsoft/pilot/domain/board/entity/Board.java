@@ -3,6 +3,7 @@ package com.estsoft.pilot.domain.board.entity;
 import com.estsoft.pilot.domain.base.BaseTimeEntity;
 import com.estsoft.pilot.domain.board.constant.BoardStatus;
 import com.estsoft.pilot.domain.comment.entity.Comment;
+import com.estsoft.pilot.domain.member.entity.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = @Index(name = "idx_group", columnList = "group_no, group_order"))
 @Entity
 public class Board extends BaseTimeEntity {
 
@@ -29,21 +31,21 @@ public class Board extends BaseTimeEntity {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "board_status", nullable = false)
+    @Column(name = "status", nullable = false)
     private BoardStatus status;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "member_id", nullable = false)
-//    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
-    @Column(name = "view_cnt", nullable = false)
-    private Integer viewCnt;
+    @Column(name = "hit", nullable = false)
+    private Integer hit;
 
     @Column(name = "group_no", nullable = false)
     private Long groupNo;
 
-    @Column(name = "group_seq", nullable = false)
-    private Integer groupSeq;
+    @Column(name = "group_order", nullable = false)
+    private Integer groupOrder;
 
     @Column(nullable = false)
     private Integer indent;
@@ -54,17 +56,19 @@ public class Board extends BaseTimeEntity {
     @Builder
     public Board(String title,
                  String content,
+                 Member member,
                  BoardStatus status,
-                 Integer viewCnt,
+                 Integer hit,
                  Long groupNo,
-                 Integer groupSeq,
+                 Integer groupOrder,
                  Integer indent) {
         this.title = title;
         this.content = content;
+        this.member = member;
         this.status = status;
-        this.viewCnt = viewCnt;
+        this.hit = hit;
         this.groupNo = groupNo;
-        this.groupSeq = groupSeq;
+        this.groupOrder = groupOrder;
         this.indent = indent;
     }
 
@@ -81,8 +85,8 @@ public class Board extends BaseTimeEntity {
         this.status = status;
     }
 
-    public void plusViewCnt() {
-        this.viewCnt++;
+    public void plusHit() {
+        this.hit++;
     }
 
     public boolean isDeleted() {

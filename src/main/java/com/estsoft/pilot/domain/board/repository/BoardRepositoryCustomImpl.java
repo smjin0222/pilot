@@ -15,6 +15,7 @@ import java.util.List;
 
 import static com.estsoft.pilot.domain.board.entity.QBoard.board;
 import static com.estsoft.pilot.domain.comment.entity.QComment.comment;
+import static com.estsoft.pilot.domain.member.entity.QMember.member;
 import static org.springframework.util.StringUtils.hasText;
 
 public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
@@ -29,11 +30,13 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
     public Page<Board> findBoardPage(String searchQuery, Pageable pageable) {
         List<Board> contents = queryFactory
                 .selectFrom(board)
+                .innerJoin(board.member, member)
+                .fetchJoin()
                 .where(ExpressionUtils.or(
                                 titleLike(searchQuery),
                                 contentLike(searchQuery))
                 )
-                .orderBy(board.groupNo.desc(), board.groupSeq.asc())
+                .orderBy(board.groupNo.desc(), board.groupOrder.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -54,8 +57,8 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
     public Board findBoardDetailById(Long boardId) {
         return queryFactory
                 .selectFrom(board)
-                .leftJoin(board.comments, comment)
-                .fetchJoin()
+                .innerJoin(board.member, member).fetchJoin()
+                .leftJoin(board.comments, comment).fetchJoin()
                 .where(
                         boardIdEq(boardId)
                 )
@@ -66,7 +69,7 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
     @Override
     public Integer findMaxGroupSeqByGroupNo(Long groupNo) {
         return queryFactory
-                .select(board.groupSeq.max())
+                .select(board.groupOrder.max())
                 .from(board)
                 .where(groupNoEq(groupNo))
                 .fetchOne();
@@ -76,7 +79,7 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
     public void updateAllGroupSeq(Long groupNo, Integer groupSeq) {
         queryFactory
                 .update(board)
-                .set(board.groupSeq, board.groupSeq.add(1))
+                .set(board.groupOrder, board.groupOrder.add(1))
                 .where(
                         groupNoEq(groupNo),
                         groupSeqGoe(groupSeq)
@@ -104,8 +107,8 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
         return groupNo != null ? board.groupNo.eq(groupNo) : null;
     }
 
-    private BooleanExpression groupSeqGoe(Integer groupSeq) {
-        return groupSeq != null ? board.groupSeq.goe(groupSeq) : null;
+    private BooleanExpression groupSeqGoe(Integer groupOrder) {
+        return groupOrder != null ? board.groupOrder.goe(groupOrder) : null;
     }
 
     private BooleanExpression commentStatusEq(CommentStatus commentStatus) {

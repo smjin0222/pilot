@@ -24,7 +24,7 @@ public class Comment extends BaseTimeEntity {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "comment_status", nullable = false)
+    @Column(name = "status", nullable = false)
     private CommentStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)

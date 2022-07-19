@@ -3,6 +3,7 @@ package com.estsoft.pilot.domain.board.service;
 import com.estsoft.pilot.domain.board.constant.BoardStatus;
 import com.estsoft.pilot.domain.board.entity.Board;
 import com.estsoft.pilot.domain.board.repository.BoardRepository;
+import com.estsoft.pilot.global.error.exception.BusinessException;
 import com.estsoft.pilot.global.error.exception.EntityNotFoundException;
 import com.estsoft.pilot.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +12,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
-public class BoardService {
+public class  BoardService {
 
     private final BoardRepository boardRepository;
 
@@ -24,12 +27,10 @@ public class BoardService {
 
     @Transactional
     public Board findBoardDetail(Long boardId) {
-        Board findBoard = boardRepository.findBoardDetailById(boardId);
-        // querydsl 사용할 경우 JPA와 다르게 Optional 반환하지 않아 null 처리에 일관성이 없어짐..
-        if(findBoard == null) {
-            throw new EntityNotFoundException(ErrorCode.NOT_EXISTS_BOARD);
-        }
-        findBoard.plusViewCnt();
+        Board findBoard = Optional.ofNullable(boardRepository.findBoardDetailById(boardId))
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_EXISTS_BOARD));
+
+        findBoard.plusHit();
 
         return findBoard;
     }
@@ -40,17 +41,16 @@ public class BoardService {
     }
 
     @Transactional
-    public Long saveBoard(Board board) {
+    public void saveBoard(Board board) {
         Board saveBoard = boardRepository.save(board);
         saveBoard.changeGroupNo();
-        return saveBoard.getId();
     }
 
     @Transactional
-    public Long saveReply(Board board) {
+    public void saveReply(Board board) {
         // 답글의 위치에 따라 기존 답글들의 위치 조정
-        boardChangePosition(board.getGroupNo(), board.getGroupSeq());
-        return boardRepository.save(board).getId();
+        boardChangePosition(board.getGroupNo(), board.getGroupOrder());
+        boardRepository.save(board);
     }
 
     private void boardChangePosition(Long groupNo, Integer groupSeq) {
@@ -61,17 +61,18 @@ public class BoardService {
     }
 
     @Transactional
-    public Board updateBoard(Long boardId, String title, String content) {
-        Board findBoard = findBoardById(boardId);
-        findBoard.updateBoardInfo(title, content);
-        return findBoard;
+    public void updateBoard(Board board, String title, String content) {
+        if(board.isDeleted()) {
+            throw new BusinessException(ErrorCode.IS_DELETED_BOARD);
+        }
+        board.updateBoardInfo(title, content);
     }
 
     @Transactional
-    public void deleteBoard(Long boardId) {
-        Board findBoard = boardRepository.findById(boardId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_EXISTS_BOARD));
-
-        findBoard.updateBoardStatus(BoardStatus.DELETE);
+    public void deleteBoard(Board board) {
+        if(board.isDeleted()) {
+            throw new BusinessException(ErrorCode.IS_DELETED_BOARD);
+        }
+        board.updateBoardStatus(BoardStatus.DELETE);
     }
 }
