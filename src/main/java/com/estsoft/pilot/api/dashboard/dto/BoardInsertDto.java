@@ -2,7 +2,6 @@ package com.estsoft.pilot.api.dashboard.dto;
 
 import com.estsoft.pilot.domain.board.constant.BoardStatus;
 import com.estsoft.pilot.domain.board.entity.Board;
-import com.estsoft.pilot.domain.member.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,11 +29,12 @@ public class BoardInsertDto {
     @NotNull(message = "indent는 필수값입니다.")
     private Integer indent;
 
-    public Board toEntity(Member member) {
+    public Board toEntity(String email, String name) {
         return Board.builder()
                 .title(title)
                 .content(content)
-                .member(member)
+                .email(email)
+                .writer(name)
                 .status(BoardStatus.NORMAL)
                 .hit(0)
                 .groupNo(groupNo)

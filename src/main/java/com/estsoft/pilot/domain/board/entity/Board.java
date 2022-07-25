@@ -3,21 +3,23 @@ package com.estsoft.pilot.domain.board.entity;
 import com.estsoft.pilot.domain.base.BaseTimeEntity;
 import com.estsoft.pilot.domain.board.constant.BoardStatus;
 import com.estsoft.pilot.domain.comment.entity.Comment;
-import com.estsoft.pilot.domain.member.entity.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(indexes = @Index(name = "idx_group", columnList = "group_no, group_order"))
+@Table(indexes = {
+        @Index(name = "IDX_GROUP", columnList = "group_no ASC, group_order ASC")
+})
 @Entity
-public class Board extends BaseTimeEntity {
+public class Board extends BaseTimeEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,16 +29,18 @@ public class Board extends BaseTimeEntity {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "longtext")
+    @Column(nullable = false)
     private String content;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private BoardStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @Column(name = "email", nullable = false)
+    private String email;
+
+    @Column(name = "name", nullable = false)
+    private String writer;
 
     @Column(name = "hit", nullable = false)
     private Integer hit;
@@ -56,7 +60,8 @@ public class Board extends BaseTimeEntity {
     @Builder
     public Board(String title,
                  String content,
-                 Member member,
+                 String email,
+                 String writer,
                  BoardStatus status,
                  Integer hit,
                  Long groupNo,
@@ -64,7 +69,8 @@ public class Board extends BaseTimeEntity {
                  Integer indent) {
         this.title = title;
         this.content = content;
-        this.member = member;
+        this.email = email;
+        this.writer = writer;
         this.status = status;
         this.hit = hit;
         this.groupNo = groupNo;
@@ -73,7 +79,7 @@ public class Board extends BaseTimeEntity {
     }
 
     public void changeGroupNo() {
-        this.groupNo = this.id;
+        this.groupNo = this.id * -1;
     }
 
     public void updateBoardInfo(String title, String content) {

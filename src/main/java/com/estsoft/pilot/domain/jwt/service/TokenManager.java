@@ -1,16 +1,11 @@
 package com.estsoft.pilot.domain.jwt.service;
 
 
-import com.estsoft.pilot.domain.jwt.constant.GrantType;
-import com.estsoft.pilot.domain.jwt.constant.TokenType;
-import com.estsoft.pilot.domain.jwt.dto.TokenDto;
-import com.estsoft.pilot.domain.member.constant.Role;
 import com.estsoft.pilot.global.error.exception.ErrorCode;
 import com.estsoft.pilot.global.error.exception.NotValidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -29,54 +24,6 @@ public class TokenManager {
 
     @Value("${token.secret}")
     private String tokenSecret;
-
-    public TokenDto createTokenDto(String email, Role role) {
-        Date accessTokenExpireTime = createAccessTokenExpireTime();
-        Date refreshTokenExpireTime = createRefreshTokenExpireTime();
-
-        String accessToken = createAccessToken(email, role, accessTokenExpireTime);
-        String refreshToken = createRefreshToken(email, refreshTokenExpireTime);
-        return TokenDto.builder()
-                .grantType(GrantType.BEARRER.getType())
-                .accessToken(accessToken)
-                .accessTokenExpireTime(accessTokenExpireTime)
-                .refreshToken(refreshToken)
-                .refreshTokenExpireTime(refreshTokenExpireTime)
-                .build();
-    }
-
-    public Date createAccessTokenExpireTime() {
-        return new Date(System.currentTimeMillis() + Long.parseLong(accessTokenExpirationTime));
-    }
-
-    public Date createRefreshTokenExpireTime() {
-        return new Date(System.currentTimeMillis() + Long.parseLong(refreshTokenExpirationTime));
-    }
-
-    public String createAccessToken(String email, Role role, Date expirationTime) {
-        String accessToken = Jwts.builder()
-                .setSubject(TokenType.ACCESS.name())                // 토큰 제목
-                .setAudience(email)                                 // 토큰 대상자
-                .setIssuedAt(new Date())                            // 토큰 발급 시간
-                .setExpiration(expirationTime)                      // 토큰 만료 시간
-                .claim("role", role)                          // 유저 role
-                .signWith(SignatureAlgorithm.HS512, tokenSecret.getBytes())
-                .setHeaderParam("typ", "JWT")
-                .compact();
-        return accessToken;
-    }
-
-    public String createRefreshToken(String email, Date expirationTime) {
-        String refreshToken = Jwts.builder()
-                .setSubject(TokenType.REFRESH.name())               // 토큰 제목
-                .setAudience(email)                                 // 토큰 대상자
-                .setIssuedAt(new Date())                            // 토큰 발급 시간
-                .setExpiration(expirationTime)                      // 토큰 만료 시간
-                .signWith(SignatureAlgorithm.HS512, tokenSecret.getBytes())
-                .setHeaderParam("typ", "JWT")
-                .compact();
-        return refreshToken;
-    }
 
     public String getMemberEmail(String accessToken) {
         String email;

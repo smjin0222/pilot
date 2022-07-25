@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class BoardListDto {
+public class BoardDto {
 
     private Long boardId;
 
@@ -26,24 +26,24 @@ public class BoardListDto {
 
     private LocalDateTime updateTime;
 
-    public static BoardListDto of(Board board) {
-        BoardListDto boardListDto = null;
+    public static BoardDto of(Board board) {
+        BoardDto boardDto = null;
 
         if(board.isDeleted()) {
-            boardListDto = BoardListDto.builder()
+            boardDto = BoardDto.builder()
                     .boardId(board.getId())
                     .title("삭제 된 게시글입니다.")
                     .writer("")
                     .indent(0)
                     .viewCnt(0)
-                    .createTime(board.getCreateTime())
-                    .updateTime(board.getUpdateTime())
+                    .createTime(null)
+                    .updateTime(null)
                     .build();
         } else {
-            boardListDto = BoardListDto.builder()
+            boardDto = BoardDto.builder()
                     .boardId(board.getId())
                     .title(board.getTitle())
-                    .writer(board.getMember().getName())
+                    .writer(board.getWriter())
                     .indent(board.getIndent())
                     .viewCnt(board.getHit())
                     .createTime(board.getCreateTime())
@@ -51,6 +51,6 @@ public class BoardListDto {
                     .build();
         }
 
-        return boardListDto;
+        return boardDto;
     }
 }

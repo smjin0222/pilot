@@ -1,7 +1,6 @@
 package com.estsoft.pilot.global.error;
 
 import com.estsoft.pilot.global.error.exception.BusinessException;
-import com.estsoft.pilot.global.error.exception.FeignClientException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,18 +68,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = { BusinessException.class })
     protected ResponseEntity<ErrorResponse> handleConflict(BusinessException e) {
         log.error("BusinessException", e);
-        List<String> errorMessages = List.of(e.getMessage());
-        HttpStatus httpStatus = HttpStatus.valueOf(e.getStatus());
-        ErrorResponse errorResponse = ErrorResponse.of(httpStatus, errorMessages);
-        return ResponseEntity.status(httpStatus).body(errorResponse);
-    }
-
-    /**
-     * FeignClient 예외 발생
-     */
-    @ExceptionHandler(FeignClientException.class)
-    protected ResponseEntity<ErrorResponse> handleFeignClientException(FeignClientException e) {
-        log.error("FeignClientException", e);
         List<String> errorMessages = List.of(e.getMessage());
         HttpStatus httpStatus = HttpStatus.valueOf(e.getStatus());
         ErrorResponse errorResponse = ErrorResponse.of(httpStatus, errorMessages);

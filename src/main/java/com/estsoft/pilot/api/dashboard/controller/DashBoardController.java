@@ -5,9 +5,6 @@ import com.estsoft.pilot.api.dashboard.service.DashBoardService;
 import com.estsoft.pilot.domain.jwt.service.TokenManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,12 +20,12 @@ public class DashBoardController {
     private final TokenManager tokenManager;
 
     @GetMapping
-    public Page<BoardListDto> getBoards(BoardSearchDto boardSearchDto,
-                                        @RequestParam(defaultValue = "0") int page,
-                                        @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<BoardListDto> boardListDtoPage = dashBoardService.getBoardDtoPage(boardSearchDto, pageable);
-        return boardListDtoPage;
+    public BoardDtoPage getBoards(@RequestParam(required = false) String searchQuery,
+                                    @RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "20") int size) {
+        // Pageable pageable = PageRequest.of(page, size);
+        BoardDtoPage boardDtoPage = dashBoardService.getBoardDtoPage(searchQuery, page, size);
+        return boardDtoPage;
     }
 
     @GetMapping("/{boardId}")

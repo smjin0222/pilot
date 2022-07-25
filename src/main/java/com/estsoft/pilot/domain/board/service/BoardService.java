@@ -7,11 +7,11 @@ import com.estsoft.pilot.global.error.exception.BusinessException;
 import com.estsoft.pilot.global.error.exception.EntityNotFoundException;
 import com.estsoft.pilot.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -21,8 +21,12 @@ public class  BoardService {
 
     private final BoardRepository boardRepository;
 
-    public Page<Board> searchBoardPage(String searchQuery, Pageable pageable) {
-        return boardRepository.findBoardPage(searchQuery, pageable);
+    public List<Board> findBoardOfPage(String searchQuery, int page, int size) {
+        return boardRepository.findBoardPaging(page, size);
+    }
+
+    public Long getTotalCount() {
+        return boardRepository.getCount();
     }
 
     @Transactional
@@ -30,7 +34,7 @@ public class  BoardService {
         Board findBoard = Optional.ofNullable(boardRepository.findBoardDetailById(boardId))
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_EXISTS_BOARD));
 
-        findBoard.plusHit();
+        // findBoard.plusHit();
 
         return findBoard;
     }
@@ -41,11 +45,19 @@ public class  BoardService {
     }
 
     @Transactional
+    public void plusBoardHitsById(Long boardId) {
+        Board findBoard = findBoardById(boardId);
+        findBoard.plusHit();
+    }
+
+    @CacheEvict(value = "board", key = "'count'")
+    @Transactional
     public void saveBoard(Board board) {
         Board saveBoard = boardRepository.save(board);
         saveBoard.changeGroupNo();
     }
 
+    @CacheEvict(value = "board", key = "'count'")
     @Transactional
     public void saveReply(Board board) {
         // 답글의 위치에 따라 기존 답글들의 위치 조정

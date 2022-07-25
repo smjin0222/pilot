@@ -36,7 +36,7 @@ public class BoardDetailDto {
 
     private List<CommentDto> comments;
 
-    public static BoardDetailDto of(Board board) {
+    public static BoardDetailDto of(Board board, String name) {
         List<CommentDto> comments = List.of();
         BoardDetailDto boardDetailDto = null;
 
@@ -60,7 +60,7 @@ public class BoardDetailDto {
                     .boardId(board.getId())
                     .title(board.getTitle())
                     .content(board.getContent())
-                    .writer(board.getMember().getName())
+                    .writer(name)
                     .createTime(board.getCreateTime())
                     .status(board.getStatus())
                     .groupNo(board.getGroupNo())

@@ -6,16 +6,18 @@ import com.estsoft.pilot.domain.comment.constant.CommentStatus;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.estsoft.pilot.domain.board.entity.QBoard.board;
 import static com.estsoft.pilot.domain.comment.entity.QComment.comment;
-import static com.estsoft.pilot.domain.member.entity.QMember.member;
 import static org.springframework.util.StringUtils.hasText;
 
 public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
@@ -30,13 +32,11 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
     public Page<Board> findBoardPage(String searchQuery, Pageable pageable) {
         List<Board> contents = queryFactory
                 .selectFrom(board)
-                .innerJoin(board.member, member)
-                .fetchJoin()
                 .where(ExpressionUtils.or(
                                 titleLike(searchQuery),
                                 contentLike(searchQuery))
                 )
-                .orderBy(board.groupNo.desc(), board.groupOrder.asc())
+                .orderBy(board.groupNo.asc(), board.groupOrder.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -54,15 +54,43 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
     }
 
     @Override
+    public List<Board> findBoardPaging(int page, int size) {
+        List<Long> ids = queryFactory
+                .select(board.id)
+                .from(board)
+                .orderBy(board.groupNo.asc(), board.groupOrder.asc())
+                .offset((long) page * (long) size)
+                .limit(size)
+                .fetch();
+
+        if(CollectionUtils.isEmpty(ids)) {
+            return new ArrayList<>();
+        }
+
+        return queryFactory
+                .selectFrom(board)
+                .where(board.id.in(ids))
+                .orderBy(board.groupNo.asc(), board.groupOrder.asc())
+                .fetch();
+    }
+
+    @Cacheable(value = "board", key = "'count'")
+    @Override
+    public Long getCount() {
+        return queryFactory
+                .select(board.count())
+                .from(board)
+                .fetchOne();
+    }
+
+    @Override
     public Board findBoardDetailById(Long boardId) {
         return queryFactory
                 .selectFrom(board)
-                .innerJoin(board.member, member).fetchJoin()
-                .leftJoin(board.comments, comment).fetchJoin()
                 .where(
                         boardIdEq(boardId)
                 )
-                .orderBy(comment.createTime.asc())
+                // .orderBy(comment.createTime.asc())
                 .fetchOne();
     }
 

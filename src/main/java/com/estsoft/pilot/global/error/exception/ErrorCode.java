@@ -21,6 +21,7 @@ public enum ErrorCode {
     // 게시판
     NOT_EXISTS_BOARD(400, "게시글 정보가 존재하지 않습니다."),
     IS_DELETED_BOARD(400, "삭제 처리 된 게시물입니다."),
+    DELETED_BOARD_NOT_REPLY(400, "삭제 처리 된 게시물에는 답글을 달 수 없습니다"),
     NOT_EXISTS_COMMENT(400, "댓글 정보가 존재하지 않습니다,"),
     INVALID_BOARD_ID(400, "수정하려는 board의 id값이 일치하지 않습니다."),
     MISMATCHED_BOARD_COMMENT_ID(400, "수정하려는 comment는 board_id에 해당하는 게시글의 댓글이 아닙니다.");
