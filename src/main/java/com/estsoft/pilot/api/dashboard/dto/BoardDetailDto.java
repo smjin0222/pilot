@@ -52,10 +52,10 @@ public class BoardDetailDto {
                     .groupSeq(board.getGroupOrder())
                     .indent(board.getIndent())
                     .viewCnt(board.getHit())
-                    .comments(comments)
+                    // .comments(comments)
                     .build();
         } else {
-            comments = CommentDto.of(board.getComments());
+            // comments = CommentDto.of(board.getComments());
             boardDetailDto = BoardDetailDto.builder()
                     .boardId(board.getId())
                     .title(board.getTitle())
@@ -67,7 +67,7 @@ public class BoardDetailDto {
                     .groupSeq(board.getGroupOrder())
                     .indent(board.getIndent())
                     .viewCnt(board.getHit())
-                    .comments(comments)
+                    // .comments(comments)
                     .build();
         }
 

@@ -11,6 +11,7 @@ public class RedisService {
 
     private final RedisTemplate redisTemplate;
 
+    // 게시글을 쓸 때 캐싱 된 total count값을 1 늘려줌
     public void plusBoardCount() {
         ValueOperations<String, Object> vop = redisTemplate.opsForValue();
         Object cnt = vop.get("board::count");

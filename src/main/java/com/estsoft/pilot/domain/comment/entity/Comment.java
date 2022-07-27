@@ -40,7 +40,7 @@ public class Comment extends BaseTimeEntity {
 
     public void setBoard(Board board) {
         this.board = board;
-        board.getComments().add(this);
+        // board.getComments().add(this);
     }
 
     public void changeContent(String content) {

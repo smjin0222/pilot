@@ -12,9 +12,8 @@ public class Listener {
 
     private final BoardService boardService;
 
-    @RabbitListener(queues = "BoardQueue")
+    @RabbitListener(queues = "BHUQueue")
     public void processMessage(@NotNull String content) {
-        Long boardId = Long.parseLong(content.split(":")[1]);
-        boardService.plusBoardHitsById(boardId);
+        boardService.plusBoardHitsById(Long.parseLong(content));
     }
 }

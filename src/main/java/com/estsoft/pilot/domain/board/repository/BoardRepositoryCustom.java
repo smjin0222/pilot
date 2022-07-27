@@ -8,8 +8,6 @@ import java.util.List;
 
 public interface BoardRepositoryCustom {
 
-    Page<Board> findBoardPage(String searchQuery, Pageable pageable);
-
     List<Board> findBoardPaging(int page, int size);
 
     Long getCount();
@@ -19,4 +17,6 @@ public interface BoardRepositoryCustom {
     void updateAllGroupSeq(Long groupNo, Integer groupSeq);
 
     Board findBoardDetailById(Long boardId);
+
+    Page<Board> findBoardPage(String searchQuery, Pageable pageable);
 }

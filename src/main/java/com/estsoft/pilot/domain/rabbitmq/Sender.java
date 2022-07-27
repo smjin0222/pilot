@@ -13,10 +13,10 @@ public class Sender {
 
     @Bean
     Queue queue() {
-        return new Queue("BoardQueue", false);
+        return new Queue("BHUQueue", false);
     }
 
     public void send(String message) {
-        template.convertAndSend("BoardQueue", message);
+        template.convertAndSend("BHUQueue", message);
     }
 }

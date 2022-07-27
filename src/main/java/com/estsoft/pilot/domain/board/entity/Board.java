@@ -2,7 +2,6 @@ package com.estsoft.pilot.domain.board.entity;
 
 import com.estsoft.pilot.domain.base.BaseTimeEntity;
 import com.estsoft.pilot.domain.board.constant.BoardStatus;
-import com.estsoft.pilot.domain.comment.entity.Comment;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,8 +9,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -54,8 +51,8 @@ public class Board extends BaseTimeEntity implements Serializable {
     @Column(nullable = false)
     private Integer indent;
 
-    @OneToMany(mappedBy = "board")
-    private List<Comment> comments = new ArrayList<>();
+//    @OneToMany(mappedBy = "board")
+//    private List<Comment> comments = new ArrayList<>();
 
     @Builder
     public Board(String title,

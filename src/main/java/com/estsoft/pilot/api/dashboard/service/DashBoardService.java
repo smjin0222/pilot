@@ -7,6 +7,7 @@ import com.estsoft.pilot.domain.comment.service.CommentService;
 import com.estsoft.pilot.domain.member.entity.Member;
 import com.estsoft.pilot.domain.member.service.MemberService;
 import com.estsoft.pilot.domain.rabbitmq.Sender;
+import com.estsoft.pilot.domain.redis.service.RedisService;
 import com.estsoft.pilot.global.error.exception.AuthorizationException;
 import com.estsoft.pilot.global.error.exception.BusinessException;
 import com.estsoft.pilot.global.error.exception.ErrorCode;
@@ -27,6 +28,8 @@ public class DashBoardService {
     private final CommentService commentService;
 
     private final MemberService memberService;
+
+    private final RedisService redisService;
 
     private final Sender rabbitMqSender;
 
@@ -51,8 +54,8 @@ public class DashBoardService {
         Board findBoard = boardService.findBoardDetail(boardId);
         Member findMember = memberService.findMemberByEmail(findBoard.getEmail());
 
-        // 큐에 메시지 전달
-        rabbitMqSender.send("boardId:" + boardId);
+        // 큐에 boardId 담긴 메시지 전달
+        rabbitMqSender.send(String.valueOf(boardId));
 
         return BoardDetailDto.of(findBoard, findMember.getName());
     }
@@ -61,6 +64,7 @@ public class DashBoardService {
     public void registerBoard(BoardInsertDto boardInsertDto, String email) {
         Member loginMember = memberService.findMemberByEmail(email);
         boardService.saveBoard(boardInsertDto.toEntity(loginMember.getEmail(), loginMember.getName()));
+        redisService.plusBoardCount();
     }
 
     @Transactional
@@ -73,6 +77,7 @@ public class DashBoardService {
         }
 
         boardService.saveReply(boardReplyDto.toEntity(loginMember.getEmail(), loginMember.getName()));
+        redisService.plusBoardCount();
     }
 
     @Transactional

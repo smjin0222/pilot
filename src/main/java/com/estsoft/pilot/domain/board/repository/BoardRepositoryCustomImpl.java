@@ -3,7 +3,6 @@ package com.estsoft.pilot.domain.board.repository;
 import com.estsoft.pilot.domain.board.constant.BoardStatus;
 import com.estsoft.pilot.domain.board.entity.Board;
 import com.estsoft.pilot.domain.comment.constant.CommentStatus;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,31 +25,6 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
 
     public BoardRepositoryCustomImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
-    }
-
-    @Override
-    public Page<Board> findBoardPage(String searchQuery, Pageable pageable) {
-        List<Board> contents = queryFactory
-                .selectFrom(board)
-                .where(ExpressionUtils.or(
-                                titleLike(searchQuery),
-                                contentLike(searchQuery))
-                )
-                .orderBy(board.groupNo.asc(), board.groupOrder.asc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        Long totalCount = queryFactory
-                .select(board.count())
-                .from(board)
-                .where(ExpressionUtils.or(
-                                titleLike(searchQuery),
-                                contentLike(searchQuery))
-                )
-                .fetchOne();
-
-        return new PageImpl<>(contents, pageable, totalCount);
     }
 
     @Override
@@ -141,5 +115,31 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
 
     private BooleanExpression commentStatusEq(CommentStatus commentStatus) {
         return commentStatus != null ? comment.status.eq(commentStatus) : null;
+    }
+
+    // 사용 X
+    @Override
+    public Page<Board> findBoardPage(String searchQuery, Pageable pageable) {
+        List<Board> contents = queryFactory
+                .selectFrom(board)
+//                .where(ExpressionUtils.or(
+//                        titleLike(searchQuery),
+//                        contentLike(searchQuery))
+//                )
+                .orderBy(board.groupNo.asc(), board.groupOrder.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long totalCount = queryFactory
+                .select(board.count())
+                .from(board)
+//                .where(ExpressionUtils.or(
+//                        titleLike(searchQuery),
+//                        contentLike(searchQuery))
+//                )
+                .fetchOne();
+
+        return new PageImpl<>(contents, pageable, totalCount);
     }
 }

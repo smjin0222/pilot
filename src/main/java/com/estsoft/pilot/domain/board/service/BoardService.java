@@ -7,7 +7,6 @@ import com.estsoft.pilot.global.error.exception.BusinessException;
 import com.estsoft.pilot.global.error.exception.EntityNotFoundException;
 import com.estsoft.pilot.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +34,6 @@ public class  BoardService {
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_EXISTS_BOARD));
 
         // findBoard.plusHit();
-
         return findBoard;
     }
 
@@ -50,14 +48,14 @@ public class  BoardService {
         findBoard.plusHit();
     }
 
-    @CacheEvict(value = "board", key = "'count'")
+    // @CacheEvict(value = "board", key = "'count'")
     @Transactional
     public void saveBoard(Board board) {
         Board saveBoard = boardRepository.save(board);
         saveBoard.changeGroupNo();
     }
 
-    @CacheEvict(value = "board", key = "'count'")
+    // @CacheEvict(value = "board", key = "'count'")
     @Transactional
     public void saveReply(Board board) {
         // 답글의 위치에 따라 기존 답글들의 위치 조정
